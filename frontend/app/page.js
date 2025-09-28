@@ -1,23 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchHello } from "./lib/api";
-
-// ✅ Import JobCard at the top with other imports
+import { fetchHello, fetchJobs } from "./lib/api"; // ✅ import fetchJobs
 import JobCard from "../components/JobCard";
 
 export default function Home() {
   const [backendMessage, setBackendMessage] = useState("Loading...");
+  const [jobs, setJobs] = useState([]); // ✅ state for jobs
+  const [loadingJobs, setLoadingJobs] = useState(true);
 
   useEffect(() => {
+    // Fetch hello message
     fetchHello().then((msg) => setBackendMessage(msg));
-  }, []);
 
-  // Sample job data (we'll fetch real jobs later)
-  const jobs = [
-    { title: "SWE I", company: "Example Corp", location: "Bangalore", url: "#" },
-    { title: "SDE I", company: "TechCo", location: "Bangalore", url: "#" },
-  ];
+    // Fetch jobs from backend
+    fetchJobs()
+      .then((data) => setJobs(data))
+      .finally(() => setLoadingJobs(false));
+  }, []);
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
@@ -26,12 +26,17 @@ export default function Home() {
         Backend says: <strong className="text-green-600">{backendMessage}</strong>
       </p>
 
-      {/* Render JobCards dynamically */}
-      <div className="w-full max-w-3xl space-y-4">
-        {jobs.map((job, index) => (
-          <JobCard key={index} {...job} />
-        ))}
-      </div>
+      {loadingJobs ? (
+        <p>Loading jobs...</p>
+      ) : jobs.length === 0 ? (
+        <p>No jobs found.</p>
+      ) : (
+        <div className="w-full max-w-3xl space-y-4">
+          {jobs.map((job, index) => (
+            <JobCard key={index} {...job} />
+          ))}
+        </div>
+      )}
     </main>
   );
 }
