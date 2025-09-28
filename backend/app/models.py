@@ -1,15 +1,15 @@
 # backend/app/models.py
 from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.sql import func
-from .database import Base
+from datetime import datetime
+from app.database import Base
 
 class Job(Base):
     __tablename__ = "jobs"
 
     id = Column(Integer, primary_key=True, index=True)
-    company = Column(String, index=True, nullable=False)
-    role = Column(String, index=True, nullable=False)
-    location = Column(String, index=True, nullable=False)
-    link = Column(String, unique=True, nullable=False)
+    company = Column(String, index=True)
+    role = Column(String, index=True)
+    location = Column(String)
+    link = Column(String)
     date_posted = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, server_default=func.now())
+    created_at = Column(DateTime, default=datetime.utcnow)

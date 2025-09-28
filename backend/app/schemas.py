@@ -17,5 +17,6 @@ class Job(JobBase):
     date_posted: Optional[datetime]
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True  # replaces orm_mode in Pydantic v2
+    }

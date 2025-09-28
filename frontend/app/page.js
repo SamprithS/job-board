@@ -1,42 +1,50 @@
-"use client";
+"use client"; // must be the first line
 
 import { useEffect, useState } from "react";
-import { fetchHello, fetchJobs } from "./lib/api"; // ✅ import fetchJobs
-import JobCard from "../components/JobCard";
+import { fetchJobs } from "./lib/api"; // make sure this path is correct
+import JobCard from "../components/JobCard"; // import your JobCard component
 
 export default function Home() {
-  const [backendMessage, setBackendMessage] = useState("Loading...");
-  const [jobs, setJobs] = useState([]); // ✅ state for jobs
-  const [loadingJobs, setLoadingJobs] = useState(true);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch jobs from backend
   useEffect(() => {
-    // Fetch hello message
-    fetchHello().then((msg) => setBackendMessage(msg));
-
-    // Fetch jobs from backend
     fetchJobs()
-      .then((data) => setJobs(data))
-      .finally(() => setLoadingJobs(false));
+      .then((data) => {
+        setJobs(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching jobs:", err);
+        setLoading(false);
+      });
   }, []);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
-      <h1 className="text-4xl font-bold text-blue-600 mb-6">Job Board — Frontend</h1>
-      <p className="text-lg text-gray-800 mb-6">
-        Backend says: <strong className="text-green-600">{backendMessage}</strong>
-      </p>
+    <main className="min-h-screen bg-gray-50 flex flex-col items-center p-6">
+  <h1 className="text-4xl md:text-5xl font-bold text-blue-600 mb-6 text-center">
+    Job Board
+  </h1>
 
-      {loadingJobs ? (
-        <p>Loading jobs...</p>
-      ) : jobs.length === 0 ? (
-        <p>No jobs found.</p>
-      ) : (
-        <div className="w-full max-w-3xl space-y-4">
-          {jobs.map((job, index) => (
-            <JobCard key={index} {...job} />
-          ))}
-        </div>
-      )}
-    </main>
+  {loading ? (
+    <p className="text-lg text-gray-800 mb-6">Loading jobs...</p>
+  ) : jobs.length === 0 ? (
+    <p className="text-lg text-gray-800 mb-6">No jobs available.</p>
+  ) : (
+    <div className="w-full max-w-4xl grid gap-6 md:grid-cols-2">
+      {jobs.map((job) => (
+        <JobCard
+          key={job.id}
+          title={job.role}
+          company={job.company}
+          location={job.location}
+          url={job.link}
+        />
+      ))}
+    </div>
+  )}
+</main>
+
   );
 }
