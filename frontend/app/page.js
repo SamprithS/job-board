@@ -1,15 +1,22 @@
 "use client"; // must be the first line
 
 import { useEffect, useState } from "react";
-import { fetchJobs } from "./lib/api"; // make sure this path is correct
+import { fetchJobs, getAuthToken } from "./lib/api"; // make sure this path is correct
 import JobCard from "../components/JobCard"; // import your JobCard component
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch jobs from backend
   useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      router.push("/login");
+      return;
+    }
     fetchJobs()
       .then((data) => {
         setJobs(data);
@@ -48,3 +55,5 @@ export default function Home() {
 
   );
 }
+
+

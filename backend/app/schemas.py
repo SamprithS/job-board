@@ -1,5 +1,5 @@
 # backend/app/schemas.py
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
@@ -18,5 +18,25 @@ class Job(JobBase):
     created_at: datetime
 
     model_config = {
-        "from_attributes": True  # replaces orm_mode in Pydantic v2
+        "from_attributes": True  
     }
+
+# --- User schemas ---
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserOut(BaseModel):
+    id: int
+    email: EmailStr
+    is_active: bool
+
+    model_config = {"from_attributes": True}
+
+# --- Token schemas ---
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
