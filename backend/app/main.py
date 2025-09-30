@@ -13,9 +13,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/auth")
-app.include_router(jobs.router, prefix="/jobs")
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
+
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello World"}
+    return {"message": "Job Board API is running"}
