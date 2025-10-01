@@ -10,7 +10,6 @@ from app.deps import get_current_user
 router = APIRouter()
 
 
-# GET /jobs/  -> List jobs (requires auth)
 @router.get("/", response_model=List[schemas.Job], tags=["jobs"])
 def read_jobs(
     db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)
@@ -19,7 +18,6 @@ def read_jobs(
     return jobs
 
 
-# GET /jobs/{id} -> Get single job (requires auth)
 @router.get("/{job_id}", response_model=schemas.Job, tags=["jobs"])
 def read_job(
     job_id: int,
@@ -34,7 +32,6 @@ def read_job(
     return job
 
 
-# POST /jobs/ -> Create a job (requires auth)
 @router.post(
     "/", response_model=schemas.Job, status_code=status.HTTP_201_CREATED, tags=["jobs"]
 )
@@ -50,6 +47,7 @@ def create_job(
         link=job_in.link,
         description=job_in.description,
         date_posted=job_in.date_posted,
+        owner_id=current_user.id,  # assign owner here
     )
     db.add(job)
     db.commit()
@@ -57,7 +55,6 @@ def create_job(
     return job
 
 
-# DELETE /jobs/{id} -> Delete job (requires auth)
 @router.delete("/{job_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["jobs"])
 def delete_job(
     job_id: int,
@@ -68,6 +65,11 @@ def delete_job(
     if not job:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
+    if job.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not the owner of this job",
         )
     db.delete(job)
     db.commit()

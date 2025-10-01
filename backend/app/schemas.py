@@ -11,7 +11,7 @@ class JobBase(BaseModel):
     link: str = Field(..., example="https://careers.google.com/job123")
     description: Optional[str] = Field(
         None, example="Work with cutting-edge technology"
-    )  # Add this
+    )
 
 
 class JobCreate(JobBase):
@@ -22,6 +22,9 @@ class Job(JobBase):
     id: int
     date_posted: Optional[datetime]
     created_at: datetime
+    owner_id: Optional[int] = None
+    owner_email: Optional[EmailStr] = None
+
     model_config = {"from_attributes": True}
 
 

@@ -1,7 +1,8 @@
 # backend/app/models.py
-from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, ForeignKey
 from datetime import datetime
 from app.database import Base
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -18,9 +19,17 @@ class Job(Base):
     __tablename__ = "jobs"
     id = Column(Integer, primary_key=True, index=True)
     company = Column(String, index=True, nullable=False)
-    role = Column(String, index=True, nullable=False)  # e.g. "SWE I"
-    location = Column(String, nullable=True)  # e.g. "Bangalore, India"
-    link = Column(String, nullable=True)  # official apply URL
+    role = Column(String, index=True, nullable=False)
+    location = Column(String, nullable=True)
+    link = Column(String, nullable=True)
     description = Column(Text, nullable=True)
     date_posted = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    # --- owner relation ---
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    owner = relationship("User", backref="jobs")
+
+    @property
+    def owner_email(self):
+        return self.owner.email if self.owner else None
