@@ -1,8 +1,8 @@
 # backend/app/models.py
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
-from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -11,7 +11,6 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
-    is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -21,13 +20,13 @@ class Job(Base):
     company = Column(String, index=True, nullable=False)
     role = Column(String, index=True, nullable=False)
     location = Column(String, nullable=True)
-    link = Column(String, nullable=True)
+    link = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
     date_posted = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # --- owner relation ---
-    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # Owner relation
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     owner = relationship("User", backref="jobs")
 
     @property

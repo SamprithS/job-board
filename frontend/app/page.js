@@ -1,10 +1,10 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { fetchJobs, getAuthToken } from "./lib/api";
 import JobCard from "../components/JobCard";
 import { useRouter } from "next/navigation";
 import CreateJobForm from "../components/CreateJobForm";
+import LogoutButton from "../components/LogoutButton";
 
 export default function Home() {
   const router = useRouter();
@@ -17,7 +17,6 @@ export default function Home() {
       router.push("/login");
       return;
     }
-
     // Pass the token to fetchJobs
     fetchJobs(token)
       .then((data) => {
@@ -37,9 +36,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center p-6">
-      <h1 className="text-4xl md:text-5xl font-bold text-blue-600 mb-6 text-center">
-        Job Board
-      </h1>
+      {/* Header with Logout Button */}
+      <div className="w-full max-w-4xl flex justify-between items-center mb-6">
+        <h1 className="text-4xl md:text-5xl font-bold text-blue-600 flex-1 text-center">
+          Job Board
+        </h1>
+        <LogoutButton />
+      </div>
 
       {/* Create Job Form */}
       <div className="w-full max-w-2xl mb-8">
@@ -64,10 +67,10 @@ export default function Home() {
               {job.description && (
                 <p className="text-sm text-gray-600 mt-2">{job.description}</p>
               )}
-              <a 
-                href={job.link} 
-                target="_blank" 
-                rel="noreferrer" 
+              <a
+                href={job.link}
+                target="_blank"
+                rel="noreferrer"
                 className="text-blue-500 hover:underline mt-2 inline-block"
               >
                 Apply
