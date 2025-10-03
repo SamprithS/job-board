@@ -18,7 +18,8 @@ def register(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     hashed = get_password_hash(user_in.password)
-    user = models.User(email=user_in.email, hashed_password=hashed)
+    # user_in.role is a UserRole enum from Pydantic
+    user = models.User(email=user_in.email, hashed_password=hashed, role=user_in.role)
     db.add(user)
     db.commit()
     db.refresh(user)

@@ -1,8 +1,23 @@
 # backend/app/models.py
-from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, ForeignKey
+import enum
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    Text,
+    Boolean,
+    ForeignKey,
+    Enum as SAEnum,
+)
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
+
+
+class UserRole(enum.Enum):
+    job_seeker = "job_seeker"
+    employer = "employer"
 
 
 class User(Base):
@@ -11,6 +26,13 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+    # Role column with default job_seeker
+    role = Column(
+        SAEnum(UserRole, name="user_role", native_enum=False),
+        nullable=False,
+        default=UserRole.job_seeker,
+        server_default="job_seeker",
+    )
     created_at = Column(DateTime, default=datetime.utcnow)
 
 

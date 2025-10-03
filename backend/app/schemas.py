@@ -1,6 +1,14 @@
+# backend/app/schemas.py
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
+import enum
+
+
+# ===== User Role Enum =====
+class UserRole(str, enum.Enum):
+    job_seeker = "job_seeker"
+    employer = "employer"
 
 
 # ===== Job Schemas =====
@@ -32,12 +40,15 @@ class Job(JobBase):
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6)
+    role: UserRole = UserRole.job_seeker  # Default to job_seeker
 
 
 class UserOut(BaseModel):
     id: int
     email: EmailStr
+    role: UserRole
     is_active: bool
+
     model_config = {"from_attributes": True}
 
 

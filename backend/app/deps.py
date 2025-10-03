@@ -3,20 +3,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.core.security import decode_access_token
-from app.database import SessionLocal
+from app.database import get_db
 from app import models
 
 # OAuth2 scheme for getting tokens
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
-
-# Database dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 # Current user dependency (with revoked token check)
@@ -41,7 +32,7 @@ def get_current_user(
         )
 
     # 3. Extract user from payload
-    email: str | None = payload.get("sub")
+    email = payload.get("sub")
     if email is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
@@ -54,4 +45,23 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
         )
 
+    return user
+
+
+# Role requirement helpers
+def require_employer(user: models.User = Depends(get_current_user)):
+    """Dependency that requires user to be an employer"""
+    if user.role.value != "employer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Employers only"
+        )
+    return user
+
+
+def require_job_seeker(user: models.User = Depends(get_current_user)):
+    """Dependency that requires user to be a job seeker"""
+    if user.role.value != "job_seeker":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Job seekers only"
+        )
     return user
