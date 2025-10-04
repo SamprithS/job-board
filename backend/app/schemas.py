@@ -11,6 +11,14 @@ class UserRole(str, enum.Enum):
     employer = "employer"
 
 
+# ===== Application Status Enum =====
+class ApplicationStatusEnum(str, enum.Enum):
+    applied = "applied"
+    reviewed = "reviewed"
+    accepted = "accepted"
+    rejected = "rejected"
+
+
 # ===== Job Schemas =====
 class JobBase(BaseModel):
     company: str = Field(..., example="Google")
@@ -60,3 +68,26 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Optional[str] = None
+
+
+# ===== Application Schemas =====
+class ApplicationBase(BaseModel):
+    job_id: int
+
+
+class ApplicationCreate(ApplicationBase):
+    pass
+
+
+class ApplicationOut(BaseModel):
+    id: int
+    job_id: int
+    user_id: int
+    status: ApplicationStatusEnum
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ApplicationUpdate(BaseModel):
+    status: ApplicationStatusEnum

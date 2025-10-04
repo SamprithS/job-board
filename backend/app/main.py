@@ -1,7 +1,7 @@
+# backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import jobs
-from .routes import auth
+from .routes import jobs, auth, applications
 
 app = FastAPI(title="Job Board API")
 
@@ -15,6 +15,7 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
+app.include_router(applications.router)
 
 
 @app.get("/")
