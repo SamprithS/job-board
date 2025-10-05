@@ -1,26 +1,42 @@
-# backend/app/database.py
-import os
+# app/database.py
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+# Load environment variables
+load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./jobs.db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-connect_args = {}
-if DATABASE_URL.startswith("sqlite"):
-    connect_args = {"check_same_thread": False}
+# Validate DATABASE_URL exists
+if not DATABASE_URL:
+    raise ValueError("❌ DATABASE_URL not found in .env file!")
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args)
+# Add SSL mode for Supabase
+if "supabase.co" in DATABASE_URL and "sslmode" not in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL + "?sslmode=require"
+
+# Create engine
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,  # Verify connections before using
+    echo=False,  # Set to True for debugging SQL queries
+)
+
+# Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base class for models
 Base = declarative_base()
 
+
+# Dependency for FastAPI routes
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-

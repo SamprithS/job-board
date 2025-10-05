@@ -1,10 +1,16 @@
-# backend/app/main.py
+# app/main.py
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import jobs, auth, applications
+from app.routes import jobs
 
-app = FastAPI(title="Job Board API")
+app = FastAPI(
+    title="Tech Jobs Aggregator API",
+    description="API for aggregating tech jobs from top companies in Bangalore",
+    version="1.0.0",
+)
 
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # Frontend URL
@@ -13,11 +19,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(jobs.router)  # Remove prefix="/jobs" - it's already in the router
-app.include_router(applications.router)  # Already has prefix in router too
+# Include only jobs router
+app.include_router(jobs.router, prefix="/api", tags=["jobs"])
 
 
 @app.get("/")
 def read_root():
-    return {"message": "Job Board API is running"}
+    return {
+        "message": "Tech Jobs Aggregator API",
+        "status": "active",
+        "version": "1.0.0",
+    }
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
