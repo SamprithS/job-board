@@ -24,6 +24,9 @@
 - **Day 11:** Implement basic web scrapers (starting with Google Careers) to automatically fetch tech job openings.
 - **Day 12:** Add an email + WhatsApp notification system for new job alerts to job seekers.
 - **Day 13:** Automate scraper runs with a scheduler (e.g., APScheduler or Celery beat).  
-  """
+   """
+  <<<<<<< HEAD
 
+=======
 
+> > > > > > > aaa3a43 (Day 10: Updated Journal)
