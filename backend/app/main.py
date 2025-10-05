@@ -14,8 +14,8 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
-app.include_router(applications.router)
+app.include_router(jobs.router)  # Remove prefix="/jobs" - it's already in the router
+app.include_router(applications.router)  # Already has prefix in router too
 
 
 @app.get("/")
