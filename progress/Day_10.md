@@ -26,10 +26,4 @@
 - **Day 13:** Automate scraper runs with a scheduler (e.g., APScheduler or Celery beat).  
   """
 
-# Save to a markdown file
 
-file_path = "/mnt/data/Day_10_Journal_Job_Board_Project.md"
-with open(file_path, "w") as f:
-f.write(journal_content)
-
-file_path
