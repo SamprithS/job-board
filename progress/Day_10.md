@@ -1,8 +1,6 @@
-from datetime import date
+# Day 10 Journal — Job Board Project
 
-journal_content = f"""# Day 10 Journal — Job Board Project
-
-**Date:** {date.today().strftime('%d-%m-%Y')}  
+**Date:** 05-10-2025  
 **Time spent:** 90 minutes
 
 ## What I did today
