@@ -5,35 +5,33 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
-# Load environment variables
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Build DATABASE_URL from components (handles special characters properly)
+if os.getenv("SUPABASE_HOST"):
+    # URL-encode the password to handle special characters like @ and %
+    password = quote_plus(os.getenv("SUPABASE_PASSWORD", ""))
+    user = os.getenv("SUPABASE_USER", "postgres")
+    host = os.getenv("SUPABASE_HOST")
+    port = os.getenv("SUPABASE_PORT", "5432")
+    db = os.getenv("SUPABASE_DB", "postgres")
 
-# Validate DATABASE_URL exists
+    DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{db}?sslmode=require"
+else:
+    DATABASE_URL = os.getenv("DATABASE_URL")
+
 if not DATABASE_URL:
-    raise ValueError("❌ DATABASE_URL not found in .env file!")
-
-# Add SSL mode for Supabase
-if "supabase.co" in DATABASE_URL and "sslmode" not in DATABASE_URL:
-    DATABASE_URL = DATABASE_URL + "?sslmode=require"
+    raise ValueError("Database credentials not found in .env file!")
 
 # Create engine
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,  # Verify connections before using
-    echo=False,  # Set to True for debugging SQL queries
-)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, echo=False)
 
-# Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Base class for models
 Base = declarative_base()
 
 
-# Dependency for FastAPI routes
 def get_db():
     db = SessionLocal()
     try:

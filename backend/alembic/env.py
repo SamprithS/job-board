@@ -1,42 +1,48 @@
 # alembic/env.py
 
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config
+from sqlalchemy import create_engine
 from sqlalchemy import pool
 from alembic import context
 import os
 import sys
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
 # Load environment variables
 load_dotenv()
 
-# Add parent directory to path to import app modules
+# Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import your models
 from app.database import Base
 from app.models import Job
 
-# this is the Alembic Config object
+# Alembic Config object
 config = context.config
 
-# Set SQLAlchemy URL from environment
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
+# Build DATABASE_URL from components
+password = quote_plus(os.getenv("SUPABASE_PASSWORD", ""))
+user = os.getenv("SUPABASE_USER", "postgres")
+host = os.getenv("SUPABASE_HOST")
+port = os.getenv("SUPABASE_PORT", "5432")
+db = os.getenv("SUPABASE_DB", "postgres")
 
-# Interpret the config file for Python logging
+database_url = f"postgresql://{user}:{password}@{host}:{port}/{db}?sslmode=require"
+
+# Configure logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Set target metadata for 'autogenerate' support
+# Set target metadata
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -48,9 +54,9 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+    # Create engine directly without using config
+    connectable = create_engine(
+        database_url,
         poolclass=pool.NullPool,
     )
 
